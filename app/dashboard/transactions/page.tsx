@@ -57,7 +57,7 @@ export default function TransactionsPage() {
         status: statusFilter,
         type: typeFilter,
       });
-      setTransactions(data || []);
+      setTransactions((data || []) as TransactionWithBooking[]);
     } catch (error) {
       console.error('Error loading transactions:', error);
     } finally {
