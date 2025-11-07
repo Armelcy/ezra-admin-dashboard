@@ -56,7 +56,7 @@ export default function ProvidersPage() {
     try {
       setLoading(true);
       const data = await adminAPI.getPendingProviders();
-      setProviders(data || []);
+      setProviders((data || []) as ProviderWithProfile[]);
     } catch (error) {
       console.error('Error loading pending providers:', error);
     } finally {
@@ -177,11 +177,11 @@ export default function ProvidersPage() {
               <div className="mt-4 space-y-2">
                 <div className="flex items-center text-sm text-gray-600">
                   <User className="h-4 w-4 mr-2 text-gray-400" />
-                  <span>{provider.profiles?.full_name || provider.user?.full_name || 'N/A'}</span>
+                  <span>{provider.profiles?.full_name || 'N/A'}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                  <span>{provider.profiles?.location || provider.user?.location || 'N/A'}</span>
+                  <span>{provider.profiles?.location || 'N/A'}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Star className="h-4 w-4 mr-2 text-gray-400" />
