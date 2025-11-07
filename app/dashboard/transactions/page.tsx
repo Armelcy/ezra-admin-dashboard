@@ -29,12 +29,13 @@ interface TransactionWithBooking {
   external_reference?: string;
   metadata: any;
   created_at: string;
+  updated_at?: string;
   bookings: {
     id: string;
     service_name: string;
-    customer_id: string;
-    provider_id: string;
-    status: string;
+    customer_id?: string;
+    provider_id?: string;
+    status?: string;
   };
 }
 

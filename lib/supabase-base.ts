@@ -6,6 +6,9 @@
 import { supabase } from './supabase';
 import type { ListParams, PaginatedResponse } from '@/types/database';
 
+// Re-export types for convenience
+export type { ListParams, PaginatedResponse } from '@/types/database';
+
 /**
  * Generic list function with pagination, search, and filters
  */

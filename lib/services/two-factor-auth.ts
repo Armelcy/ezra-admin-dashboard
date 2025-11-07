@@ -240,7 +240,7 @@ export async function verifyTwoFactorCode(
       if (isValidBackupCode) {
         // Remove used backup code
         const hashedCode = await hashBackupCode(code);
-        const remainingCodes = user.backup_codes.filter(c => c !== hashedCode);
+        const remainingCodes = user.backup_codes.filter((c: string) => c !== hashedCode);
 
         await supabase
           .from('profiles')

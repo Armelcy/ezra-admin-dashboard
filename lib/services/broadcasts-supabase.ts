@@ -101,7 +101,7 @@ async function sendOneSignalNotification(
   targetFilters: any[],
   data?: Record<string, any>
 ): Promise<{ id: string; recipients: number }> {
-  const payload = {
+  const payload: Record<string, any> = {
     app_id: config.appId,
     headings: { en: title },
     contents: { en: message },

@@ -61,7 +61,7 @@ export interface ActionCenterSummary {
 }
 
 export interface ListParams {
-  queue: Queue;
+  queue?: Queue;
   page?: number;
   limit?: number;
   assignedTo?: 'me' | 'unassigned' | 'all';
