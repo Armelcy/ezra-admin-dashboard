@@ -1,0 +1,26 @@
+# Admin Dashboard - Block All Crawlers
+# This is a private admin interface and should not be indexed
+
+User-agent: *
+Disallow: /
+
+# Explicitly block common bots
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+# No sitemap - this is an admin interface

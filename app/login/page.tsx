@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Shield } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getTwoFactorStatus, verifyTwoFactorCode } from '@/lib/services/two-factor-auth';
+import { logAuthEvent } from '@/lib/services/audit-log';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,6 +25,10 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
+    // Get client info for audit logging
+    const ipAddress = 'unknown'; // Will be set by middleware in production
+    const userAgent = navigator.userAgent;
+
     try {
       // Sign in with Supabase
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -31,7 +36,13 @@ export default function LoginPage() {
         password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        // Log failed login attempt
+        await logAuthEvent('login_failed', undefined, email, ipAddress, userAgent, 'Authentication failed');
+
+        // Use generic error message - don't reveal if email exists
+        throw new Error('Invalid credentials. Please check your email and password.');
+      }
 
       // Check if user is admin
       const { data: profile, error: profileError } = await supabase
@@ -40,16 +51,22 @@ export default function LoginPage() {
         .eq('id', authData.user.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        await supabase.auth.signOut();
+        await logAuthEvent('login_failed', authData.user.id, email, ipAddress, userAgent, 'Profile not found');
+        throw new Error('Invalid credentials. Please check your email and password.');
+      }
 
       if (profile.role !== 'admin') {
         await supabase.auth.signOut();
-        throw new Error('Access denied: Admin privileges required');
+        await logAuthEvent('login_failed', authData.user.id, email, ipAddress, userAgent, 'Not an admin user');
+        throw new Error('Invalid credentials. Please check your email and password.');
       }
 
       if (!profile.is_active) {
         await supabase.auth.signOut();
-        throw new Error('Account is disabled');
+        await logAuthEvent('login_failed', authData.user.id, email, ipAddress, userAgent, 'Account disabled');
+        throw new Error('Your account has been disabled. Please contact support.');
       }
 
       // Check if 2FA is enabled
@@ -60,11 +77,12 @@ export default function LoginPage() {
         return;
       }
 
-      // Success - redirect to dashboard
+      // Success - log and redirect
+      await logAuthEvent('login_success', authData.user.id, email, ipAddress, userAgent);
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Invalid credentials. Please check your email and password.');
     } finally {
       setLoading(false);
     }
